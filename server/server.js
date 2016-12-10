@@ -18,11 +18,39 @@ var io = socketIO(server);    //get back our websockets Server
 
 app.use(express.static(publicPath));
 io.on('connection', function(socket){ //reps indiv socket rather than all users connected to the server
-  console.log(`New User Connected`);  //connection event also exists on client
+  console.log(`\n\nNew User Connected\n`);  //connection event also exists on client
                                       //client can do something when successfully Connected
                                       //ADD this event inside of index.html (socket.on('connect'))
-  socket.on('disconnect', function(){
-    console.log('Client was DISCONNECTED');
+
+  //CUSTOM EVENT method call
+    //EMIT: instead of listening to an event, creating an event
+    //      emit(nameof Event we want to emit, specifyCUSTOM DATA)
+  socket.emit('newEmail', {
+    "from": "nolan@example.com",
+    "text": "just some email text",
+    "createAt": 123
+  }); //send this data from server to client
+  //CHALLENGE newMessage (emitted by server, listened to on client)
+  socket.emit('newMessage', {
+    from: "whoMessageisFrom@email.com",
+    text: "newMessage event emitted from the server when a user connects and listen to it on the client",
+    createdAt: 123234
+  });
+
+  //CUSTOM EVENT listener
+  socket.on('createEmail', function(createdEmail){
+    console.log('createEmail', createdEmail); //need to emit this on the client in index.js socket.on('connect' callback function)
+  });
+  //CHALLENGE createMessage (come from client TO the server)
+      //user1 fires createMessage event from my browser to SERVER --> server fires newMessage events to everyone else
+      //emit from client and listened to by server
+  socket.on('createMessage', function(createdMessage){
+    //createdAt is created on server so users cannot spoof it anywhere else
+    console.log('createMessage', createdMessage);
+  });
+
+  socket.on('disconnect', function(){ //'disconnect' is the event to listen to
+    console.log('\n\nClient was DISCONNECTED\n');
   });
 });
 
