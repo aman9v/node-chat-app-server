@@ -3,20 +3,11 @@ var socket = io();
 socket.on('connect', function(){
   console.log('Connected to the Server (this message was sent from index.html)');
 
-  socket.emit('createEmail', {
-    to: 'jen@example.com',
-    text: 'client-side script connects to the server and emits this createEmail event'
-  });
-
   // socket.emit('createEmail', {to: "julie@sdf.com", text: "event emitted from browser console"});
         //^^can be entered through the browser console to the server console
   //CHALLENGE createMessage
   //user1 fires createMessage event from my browser
       //to SERVER --> server fires newMessage events to everyone else
-  socket.emit('createMessage', {
-    from: 'aUsertotheServer',
-    text: 'User on Browser fires event to server, server fires newMessage events to everyone else'
-  });
 });
 
 socket.on('disconnect', function(){
