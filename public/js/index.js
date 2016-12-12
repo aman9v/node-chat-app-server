@@ -1,5 +1,30 @@
 //CLIENT-SIDE javascript
 var socket = io();
+
+function scrollToBottom(){
+  // Selectors
+  var messages = jQuery('#messages');
+  //variable that stres the selector for the LAST list item (the message that triggered this call)
+  // var newMessage = jQuery('#messages')....
+  var newMessage = messages.children('li:last-child');
+  //Heights
+        //messages.prop is a cross-browser way
+        //to fetch a property (Alternative to jQuery bc it works for all browsers)
+  //CALCULATION
+    //this happens AFTER a new message is included
+  var clientHeight = messages.prop('clientHeight');
+  var scrollTop = messages.prop('scrollTop');
+  var scrollHeight = messages.prop('scrollHeight');
+  var newMessageHeight = newMessage.innerHeight();
+  var lastMessageHeight = newMessage.prev().innerHeight();    //prev() method calls the previous child!!
+
+  if((clientHeight + scrollTop + newMessageHeight + lastMessageHeight)>= scrollHeight){
+    console.log('Should scroll to bottom!!');
+    messages.scrollTop(scrollHeight); //moves to bottom of container area
+  }
+};
+
+
 socket.on('connect', function(){
   console.log(socket.id);
   console.log(`NEW CONNECTION (this message was sent from index.html)
@@ -20,6 +45,7 @@ socket.on('newMessage', function(message){
     from: message.from
   });
   jQuery('#messages').append(html);
+  scrollToBottom();
 });
 
 //EVENT Listener for newLocationMessage EVENT
@@ -32,6 +58,7 @@ socket.on('newLocationMessage', function(message){
     url: message.url
   });
   jQuery('#messages').append(html);   //jQuery selector selects element #messages
+  scrollToBottom();
 });
 
 
