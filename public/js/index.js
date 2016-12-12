@@ -12,27 +12,26 @@ socket.on('disconnect', function(){
 
 socket.on('newMessage', function(message){
   console.log('New Message', message);
-
   var formattedTime = moment(message.createdAt).format('h:mm a');
-
-  var li = jQuery('<li></li>');
-  // li.text(`${message.from}: ${message.text}`); //created an element but have not rendered it to the dom
-  li.text(`${message.from} ${formattedTime}: ${message.text}`); //created an element but have not rendered it to the dom
-    jQuery('#messages').append(li);
+  var template = jQuery('#message-template').html();
+  var html = Mustache.render(template, {
+    text: message.text,
+    createdAt: formattedTime,
+    from: message.from
+  });
+  jQuery('#messages').append(html);
 });
 
 //EVENT Listener for newLocationMessage EVENT
 socket.on('newLocationMessage', function(message){
   var formattedTime = moment(message.createdAt).format('h:mm a');
-
-  var li = jQuery('<li></li>');
-  var anchorTag = jQuery('<a target="_blank">My Current Location</a>');
-        //^^^ setting anchors target var to blank directs browser to open link in a new tab
-  li.text(`${message.from} (${formattedTime}): `);
-  anchorTag.attr('href', message.url);
-
-  li.append(anchorTag);
-  jQuery('#messages').append(li);
+  var template = jQuery('#geomessage-template').html();
+  var html = Mustache.render(template, {
+    from: message.from,
+    createdAt: formattedTime,
+    url: message.url
+  });
+  jQuery('#messages').append(html);   //jQuery selector selects element #messages
 });
 
 
@@ -53,12 +52,8 @@ jQuery('#message-form').on('submit', function(eventArgument){
 var locationButton = jQuery('#send-location');
 locationButton.on('click', function(){
   if(!navigator.geolocation){
-    return alert('Geolocation is NOT SUPPORTED by your Browser');      //an alert box
+    return alert('Geolocation is NOT SUPPORTED by your Browser');  //an alert box
   }
-
-  //set attribute to disable button while sending
-  // locationButton.attr('disabled', 'disabled');
-  // locationButton.attr('text', 'Sending ...');
   locationButton.attr('disabled', 'disabled').text('Sending ... ');
 
   navigator.geolocation.getCurrentPosition(function(position){

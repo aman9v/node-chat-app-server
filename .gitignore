@@ -5,4 +5,6 @@ server/serverBROADCAST.js
 server/serverGEO1.js
 public/js/index1.html
 */**/*1.*
+*/**/*2.*
+public/js/indexMustache.js
 notes.txt
