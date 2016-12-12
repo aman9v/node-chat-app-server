@@ -27,7 +27,11 @@ io.on('connection', function(socket){ //reps indiv socket rather than all users 
     console.log('createMessage', createdMessage);
 
     io.emit('newMessage', generateMessage(createdMessage.from, createdMessage.text));
-    callback('This is from the server, firing a callback after emitting the created message from a user');
+    // callback('This is from the server, firing a callback after emitting the created message from a user');
+    callback(); //dont need to pass an arg,
+                  //Acknowledgement function still gets called in index.js
+                  //client only needs to know that the call was made, not any new data
+
   });
 
   //GEOLOCATION EVENT listener
@@ -35,7 +39,7 @@ io.on('connection', function(socket){ //reps indiv socket rather than all users 
     console.log(`${user}\n\t`, coords);
     //io.emit('newMessage', generateMessage(`USER(${user}): `, `${coords.latitude}, ${coords.longitude}`));
     io.emit('newLocationMessage', generateLocationMessage(`USER(${user})`,
-                                                          coords.latitude, coords.longitude));
+                                                          coords.latitude, coords.longitude));  
   });
 
   socket.on('disconnect', function(){ //'disconnect' is the event to listen to
