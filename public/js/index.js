@@ -34,6 +34,20 @@ socket.on('newMessage', function(message){
     jQuery('#messages').append(li);
 });
 
+//EVENT Listener for newLocationMessage EVENT
+socket.on('newLocationMessage', function(message){
+  var li = jQuery('<li></li>');
+  var anchorTag = jQuery('<a target="_blank">My Current Location</a>');
+        //^^^ setting anchors target var to blank directs browser to open link in a new tab
+  li.text(`${message.from}: `);
+  //update anchor tag by using attr to fetch attributes
+      //one arg GETS value, 2 args SETS value
+  anchorTag.attr('href', message.url);
+  //append the anchor tag to end of list
+  li.append(anchorTag);
+  jQuery('#messages').append(li);
+});
+
 
 //call jQuery with the selector and an event listener
     //--listener should be calling on, and providing 2 args (eventName, function(){})
@@ -44,6 +58,30 @@ jQuery('#message-form').on('submit', function(eventArgument){
     from: `User: ${socket.id}`,
     text: jQuery('[name=message]').val()
   }, function(){//add callback function
-
   });
+});
+
+
+
+//SEND LOCATION BUTTON CLICK listener
+var locationButton = jQuery('#send-location');
+// jQuery('#send-location').on    //making 2 jQuery calls to the same dom is wasteful
+locationButton.on('click', function(){
+  //check if the user has access to the geolocation API (only if they are on old browser)
+  if(!navigator.geolocation){
+    return alert('Geolocation is NOT SUPPORTED by your Browser');      //an alert box
+  }
+  navigator.geolocation.getCurrentPosition(function(position){
+    //success case, emit the event
+    //want to send lng, lat info to the server so server can send it out
+    console.log(position);
+    //info flows from client, emit long,lat to server, server emits newLocationMessage
+    socket.emit('createLocationMessage', socket.id, {
+      latitude: position.coords.latitude,
+      longitude: position.coords.longitude
+    }); //listen to this event in the server
+
+  }, function(){  //error handler function
+    alert('Unable to Fetch Location (user rejection)');
+  })
 });

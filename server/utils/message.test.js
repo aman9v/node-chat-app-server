@@ -2,7 +2,7 @@
 var expect = require('expect');
 
 //load in the module we are testing
-var {generateMessage} = require('./message');
+var {generateMessage, generateLocationMessage} = require('./message');
 
 //TEST: generateMessage()
 describe('TEST \tgenerateMessage(from, text)', function(){
@@ -25,5 +25,21 @@ describe('TEST \tgenerateMessage(from, text)', function(){
                       // });
             //replace ^^ WITH:
             expect(message).toInclude({from, text});
+  });
+});
+
+//Synchronous
+describe('TEST \tgenerateLocationMessage', function(){
+  it('Should generate the correct location object', function(){
+    //pass in from, lat, longitude
+    var from = 'messageTeserFILE';
+    var latitude = '50';
+    var longitude = '50';
+    var message = generateLocationMessage(from, latitude, longitude);
+
+    expect(message.createdAt).toBeA('number');
+    expect(message.url).toBe('https://www.google.com/maps?q=50,50');
+    // expect(message.from).toBe(from); //replaced with below code
+    expect(message).toInclude({from});
   });
 });
