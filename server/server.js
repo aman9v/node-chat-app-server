@@ -20,8 +20,8 @@ io.on('connection', function(socket){ //reps indiv socket rather than all users 
   console.log(`\n\nNew User Connected:    ${socket.id}\n`);
 
   socket.emit('newMessage',
-              generateMessage(`ADMIN: ${port}\n`,
-                              `\tHello, USER(${socket.id})! \tWelcome to the Message App! `));
+              generateMessage(`ADMIN ${port}\n`,
+                              `\tHello, USER(${socket.id})! \n\tWelcome to the Message App! `));
 
   socket.on('createMessage', function(createdMessage, callback){
     console.log('createMessage', createdMessage);
@@ -39,7 +39,7 @@ io.on('connection', function(socket){ //reps indiv socket rather than all users 
     console.log(`${user}\n\t`, coords);
     //io.emit('newMessage', generateMessage(`USER(${user}): `, `${coords.latitude}, ${coords.longitude}`));
     io.emit('newLocationMessage', generateLocationMessage(`USER(${user})`,
-                                                          coords.latitude, coords.longitude));  
+                                                          coords.latitude, coords.longitude));
   });
 
   socket.on('disconnect', function(){ //'disconnect' is the event to listen to

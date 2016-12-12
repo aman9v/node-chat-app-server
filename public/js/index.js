@@ -13,17 +13,22 @@ socket.on('disconnect', function(){
 socket.on('newMessage', function(message){
   console.log('New Message', message);
 
+  var formattedTime = moment(message.createdAt).format('h:mm a');
+
   var li = jQuery('<li></li>');
-    li.text(`${message.from}: ${message.text}`); //created an element but have not rendered it to the dom
+  // li.text(`${message.from}: ${message.text}`); //created an element but have not rendered it to the dom
+  li.text(`${message.from} ${formattedTime}: ${message.text}`); //created an element but have not rendered it to the dom
     jQuery('#messages').append(li);
 });
 
 //EVENT Listener for newLocationMessage EVENT
 socket.on('newLocationMessage', function(message){
+  var formattedTime = moment(message.createdAt).format('h:mm a');
+
   var li = jQuery('<li></li>');
   var anchorTag = jQuery('<a target="_blank">My Current Location</a>');
         //^^^ setting anchors target var to blank directs browser to open link in a new tab
-  li.text(`${message.from}: `);
+  li.text(`${message.from} (${formattedTime}): `);
   anchorTag.attr('href', message.url);
 
   li.append(anchorTag);
@@ -36,7 +41,7 @@ jQuery('#message-form').on('submit', function(eventArgument){
   var messageTextBox = jQuery('[name=message]');
 
   socket.emit('createMessage', {
-    from: `User: ${socket.id}`,
+    from: `User ${socket.id}`,
     text: messageTextBox.val()
   }, function(){//add callback function
     messageTextBox.val('');
