@@ -7,7 +7,15 @@
 </head>
 <body>
   <p>Welcome to the node.js Chat App</p>
+  <al id="messages"></al>
+  
+  <form id="message-form">
+    <input name="message" type="text" placeholder="Message" />
+    <button>Send</button>
+  </form>
+
   <script src="socket.io/socket.io.js"></script>
+  <script src="/js/libs/jquery-3.1.1.min.js"></script>
   <script>
   //below jscript will be moved to seperate file to edit the client-side js (index.js)
     // var socket = io();
