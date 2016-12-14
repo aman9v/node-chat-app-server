@@ -55,21 +55,28 @@ io.on('connection', function(socket){ //reps indiv socket rather than all users 
   });
 
   socket.on('createMessage', function(createdMessage, callback){
-    console.log('createMessage', createdMessage);
-
-    io.emit('newMessage', generateMessage(createdMessage.from, createdMessage.text));
+   var user = users.getUserMead(socket.id);
+   console.log(user);
+   console.log(user.name);
+   console.log(user.room);
+   if(user){
+     if(isRealString(createdMessage.text)){
+       io.to(user.room).emit('newMessage', generateMessage(user.name, createdMessage.text));
+     }
+   }
     // callback('This is from the server, firing a callback after emitting the created message from a user');
     callback(); //dont need to pass an arg,
                   //Acknowledgement function still gets called in index.js
                   //client only needs to know that the call was made, not any new data
-
   });
 
   //GEOLOCATION EVENT listener
   socket.on('createLocationMessage', function(user, coords){
     console.log(`${user}\n\t`, coords);
+    var us = users.getUserMead(socket.id);
+    console.log('GeoLocation USER: ', us);
     //io.emit('newMessage', generateMessage(`USER(${user}): `, `${coords.latitude}, ${coords.longitude}`));
-    io.emit('newLocationMessage', generateLocationMessage(`USER(${user})`,
+    io.to(us.room).emit('newLocationMessage', generateLocationMessage(us.name,
                                                           coords.latitude, coords.longitude));
   });
 
