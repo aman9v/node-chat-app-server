@@ -4,6 +4,7 @@ const http = require('http');
 const express = require('express');
 const socketIO = require('socket.io');
 
+const {Rooms} = require('./utils/rooms');
 const {Users} = require('./utils/users');
 const {isRealString} = require('./utils/validation');
 const {generateMessage} = require('./utils/message');
@@ -16,11 +17,26 @@ var app = express();
 var server = http.createServer(app);  //now using the http server INSTEAD of express
 var io = socketIO(server);
 var users = new Users();
+var rooms = new Rooms();
+
+var updateRooms = function(){
+  rooms.rooms.forEach(function(r){
+    var listed = users.getUserList(r.name);
+    console.log(`Users listed in ${r.name}: `, listed);
+    if(listed){
+      if(listed.length === 0) return rooms.removeRoom(r);
+    }
+  });
+}
 
 app.use(express.static(publicPath));
 
 io.on('connection', function(socket){ //reps indiv socket rather than all users connected to the server
   console.log(`\n\nNew User Connected:    ${socket.id}\n`);
+  socket.emit('updateRoomsList', rooms.getRoomsList());
+
+  updateRooms();
+  console.log('Updated ROOMS List from Server io.on(connection)\n\n');
 
   socket.on('join', function(params, callback){
     //validate data (name and room) --> create new utils file for duplicate code
@@ -28,8 +44,23 @@ io.on('connection', function(socket){ //reps indiv socket rather than all users 
       //call the callback with a str message
       return callback('Name and Room Name are required');
     }
+    console.log('PARAMS at LOGIN: ', params.name, params.room);
+    var name = params.name;
+    //return this.users.filter((user)=> user.id===id)[0];
+    var taken = false;
+    var room = params.room.toUpperCase();
+    taken = users.users.filter((user)=> user.name===name && user.room === room);
+    if(taken.length > 0){ return callback('Display Name already exists in that Chat Room');}
+    console.log(taken);
 
-    socket.join(params.room);
+    var boo = rooms.rooms.filter((ro)=> ro.name=== room);
+    if(boo.length === 0){
+      rooms.addRoom(room);
+      socket.emit('updateRoomsList', rooms.getRoomsList());
+    }
+
+    socket.join(room);
+
     // socket.leave(params.room);
     //target specific users (users only in that room)
         //io.emit --> sends the message to everyone on socket server
@@ -41,16 +72,16 @@ io.on('connection', function(socket){ //reps indiv socket rather than all users 
     //ADD A USER TO THE LIST when they joined the chatroom
       //make sure there is not already a user with that socket id
     users.removeUser(socket.id);
-    users.addUser(socket.id, params.name, params.room);
+    users.addUser(socket.id, params.name, room);
             //not supposed to run if there is a validation error
                     //add a return to the socket.on isRealString code up top
     //emit the event with newly updated user List
-    io.to(params.room).emit('updateUserList', users.getUserList(params.room));
+    io.to(room).emit('updateUserList', users.getUserList(room));
 
     socket.emit('newMessage',
                 generateMessage(`ADMIN ${port}\n`,
-                                `\tHello, USER(${params.name})! \n\tWelcome to the ${params.room}! `));
-    socket.broadcast.to(params.room).emit('newMessage', generateMessage('ADMIN', `${params.name} has joined`));
+                                `\tHello, USER(${params.name})! \n\tWelcome to the ${room}! `));
+    socket.broadcast.to(room).emit('newMessage', generateMessage('ADMIN', `${params.name} has joined`));
     callback(); //no arg because we set up the first arg to be an error arg in chat.js
   });
 
@@ -83,10 +114,13 @@ io.on('connection', function(socket){ //reps indiv socket rather than all users 
   socket.on('disconnect', function(){ //'disconnect' is the event to listen to
     console.log(`CLIENT: ${socket.id} was DISCONNECTED from server`);
     var user = users.removeUser(socket.id);
+    var room;// = user.room;
 
     if(user){
+      room = user.room;
       io.to(user.room).emit('updateUserList', users.getUserList(user.room));
       io.to(user.room).emit('newMessage', generateMessage('ADMIN', `${user.name} has left the ${user.room}`));
+      updateRooms();
     }
   });
 });

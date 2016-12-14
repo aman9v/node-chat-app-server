@@ -27,7 +27,7 @@ border-radius:5px;
 padding:0 20px;
 margin:20px;
 width:230px}.form-field{margin:20px 0}.form-field>*{width:100%}.form-field label{display:block;
-margin-bottom:7px}.form-field input,.form-field select{border:1px solid #e1e1e1;
+margin-bottom:7px}.form-field input,.form-fieldselect{border:1px solid #e1e1e1;
 padding:10px}.chat{display:flex}.chat__sidebar{overflow-y:scroll;
 width:260px;
 height:100vh;

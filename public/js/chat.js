@@ -32,6 +32,7 @@ socket.on('connect', function(){
 
   //Emit an  event that will start the process of JOINING a room
   var params = jQuery.deparam(window.location.search);
+  
   //include Acknowledgement function
   socket.emit('join', params, function(err){
     if(err){
@@ -57,7 +58,7 @@ socket.on('updateUserList', function(users){
   });
   //render it by ordering it to the dom
   jQuery('#users').html(ol);
-})
+});
 
 
 socket.on('newMessage', function(message){
