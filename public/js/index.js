@@ -1,5 +1,6 @@
 var socket = io();
 var template = jQuery('#open-rooms-template').html();
+const noMessage = 'No Available Chat Rooms';
 
 jQuery('#open-rooms-template').on('submit', function(eventArgument){
   eventArgument.preventDefault();   //stop the submit event from firing, now nothing happens
@@ -41,11 +42,28 @@ function addToDropBox(room){
   option.text = room;
   console.log('ROOM trying to be updated: ', option);
   x.add(option);
+  if(room != noMessage){
+    var option = document.createElement("option");
+    option.text = noMessage;
+    x.remove(option);
+  }
 }
 
 function onSelectedChanged(){
-  document.getElementById('room-text').value = (document.getElementById('open-rooms').value);
-  console.log(document.getElementById('open-rooms').value);
+  var selectBox = document.getElementById('open-rooms');
+  if(selectBox.value != noMessage){
+    document.getElementById('room-text').value = (document.getElementById('open-rooms').value);
+    console.log(selectBox.value);
+  }
 }
-
+function loadDropDown(){
+  console.log('DROPDOWN menu was loaded');
+  if(document.getElementById('open-rooms').value.length === 0)
+  {
+    console.log('DROPDOWN menu value is ZERO');
+    this.addToDropBox(noMessage);
+  }else{
+    this.onSelectedChanged();
+  }
+}
 console.log('THE INDEX.JS FILE WAS RUN');

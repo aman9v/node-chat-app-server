@@ -11,7 +11,7 @@
   </div>
 </head>
 
-<body class="centered-form">
+<body class="centered-form" onLoad="loadDropDown()">
   <div class="centered-form__form">
     <form action="/chat.html">
       <div class="form-field">
@@ -26,8 +26,10 @@
         <input id="room-text" type="text" name="room"/>
       </div>
       <div>
-          <select id="open-rooms" text="Available Chat Rooms" onChange="onSelectedChanged()">
-          </select>
+        <label>Online Chat Rooms</label>
+      </div>
+      <div>
+        <select id="open-rooms" onclick="onSelectedChanged()"onChange="onSelectedChanged()"></select>
       </div>
       <div class="form-field">
         <button>Join</button>
