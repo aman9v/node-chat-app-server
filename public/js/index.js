@@ -43,4 +43,9 @@ function addToDropBox(room){
   x.add(option);
 }
 
+function onSelectedChanged(){
+  document.getElementById('room-text').value = (document.getElementById('open-rooms').value);
+  console.log(document.getElementById('open-rooms').value);
+}
+
 console.log('THE INDEX.JS FILE WAS RUN');
