@@ -21,9 +21,10 @@ class Users {
   }
   addUser(id, name, room){
     var message = "";
+    var messages = [];
     if(isRealString(name)){
       if(isRealString(room)){
-        var user = {id, name, room};
+        var user = {id, name, room, messages};
         this.users.push(user);
         return user;
       }else {
@@ -84,6 +85,19 @@ class Users {
   getUserMead(id){
     return this.users.filter((user)=> user.id===id)[0];
   }
+  updateMessages(id, message){
+    var user = this.getUserMead(id);
+
+    if(user){
+      console.log('Should have updateMessages for user');
+      console.log(message);
+      user.messages.push(message);
+      return user;
+    }
+  }
+  // updateMessages(message){
+  //   var user = message.from
+  // }
 }
 
 module.exports = {Users};

@@ -13,11 +13,10 @@ class Rooms {
   }
   addRoom(name){
     var message = "";
+    var messages = [];
     if(isRealString(name)){
       if(this.isTaken(name)===false){
-        var room = {
-          name: name
-        }
+        var room = {name, messages}
         this.rooms.push(room);
         return room;
       }else {
@@ -33,12 +32,9 @@ class Rooms {
 
   getRoom(name){
     var matches = this.rooms.filter(function(r){
-      r.name === name
+      return r.name === name
     });
-    if(matches.length > 0){
-      return matches[0];
-    }
-    return undefined;
+    return matches[0];
   }
 
   roomIsEmpty(room){
@@ -72,6 +68,23 @@ class Rooms {
     this.rooms.splice(index, 1);
     console.log(this.rooms);
     return room;
+  }
+
+  updateMessages(name, message){
+    // var r = this.getRoom(name);
+    console.log('\n\nRoom Name to be updated: ', name);
+    var matches= this.rooms.filter(function(r){
+      return r.name === name;
+    });
+    var r = matches[0];
+    console.log('\n', r);      //HOW THE FUCK IS THIS UNDEFINED
+    console.log('\n\n\n');
+    if(r){
+      console.log('Should have updateMessages for ROOM', r.name);
+      console.log(message);
+      r.messages.push(message);
+      return r;
+    }
   }
 }
 

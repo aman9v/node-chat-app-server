@@ -1,6 +1,6 @@
 //CLIENT-SIDE javascript
 var socket = io();
-
+var messageForm = jQuery('#messages');
 function scrollToBottom(){
   // Selectors
   var messages = jQuery('#messages');
@@ -27,26 +27,21 @@ function scrollToBottom(){
 
 socket.on('connect', function(){
   console.log(socket.id);
-  // console.log(`NEW CONNECTION (this message was sent from index.html)
-  // \t CLIENT: ${socket.id}`);
 
-  //Emit an  event that will start the process of JOINING a room
   var params = jQuery.deparam(window.location.search);
-  
-  //include Acknowledgement function
+
   socket.emit('join', params, function(err){
     if(err){
       alert(err);
-      //direct them back to the root page
       window.location.href ='/';
     }else{  //no error
+      messageForm= jQuery('#messages').children('li');
+      console.log(messageForm);
+      console.log(jQuery('#messages').children('li'));
+      console.log(jQuery('#messages').children('li')[0].children[1].innerText);
       console.log('No ERROR');
     }
   });
-});
-
-socket.on('disconnect', function(){
-  console.log(`CLIENT: ${socket.id} --> DISCONNECTED from Server`);
 });
 
 //NEW LISTENER --> Update the User List
@@ -56,7 +51,6 @@ socket.on('updateUserList', function(users){
   users.forEach(function(user){
     ol.append(jQuery('<li></li>').text(user.name));    //append the list item
   });
-  //render it by ordering it to the dom
   jQuery('#users').html(ol);
 });
 
@@ -65,11 +59,13 @@ socket.on('newMessage', function(message){
   console.log('New Message', message);
   var formattedTime = moment(message.createdAt).format('h:mm a');
   var template = jQuery('#message-template').html();
-  var html = Mustache.render(template, {
+  var m = {
     text: message.text,
     createdAt: formattedTime,
     from: message.from
-  });
+  }
+  var html = Mustache.render(template,m);
+  socket.emit('updateMessages', m);
   jQuery('#messages').append(html);
   scrollToBottom();
 });
